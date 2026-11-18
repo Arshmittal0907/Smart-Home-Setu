@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api';
+import { api, safeApiFetch } from '../api';
 import { Building, Plus, CheckCircle2, XCircle, Clock, Users, Bed, MapPin, IndianRupee, ShieldCheck, Check, X, FileText, AlertTriangle, Shield, UploadCloud, Sparkles, MessageSquare, Bot, ArrowRight, TrendingUp } from 'lucide-react';
 import PgFeaturesModal from './PgFeaturesModal';
 import AiOwnerMarketAgent from './AiOwnerMarketAgent';
+import { INDIAN_STATES_DATA, getStateData, getLocalitiesForState } from '../statesData';
 
 export default function OwnerDashboard({ openAuthModal, onExploreClick, onOpenFeedback }) {
   const { currentUser, logout } = useAuth();
@@ -21,7 +22,12 @@ export default function OwnerDashboard({ openAuthModal, onExploreClick, onOpenFe
   const [loading, setLoading] = useState(false);
 
   // New listing form state
+  const [selectedState, setSelectedState] = useState('Maharashtra');
+  const [selectedLocalityIndex, setSelectedLocalityIndex] = useState(0);
+  const [isCustomLocality, setIsCustomLocality] = useState(false);
+
   const [formData, setFormData] = useState({
+    state: 'Maharashtra',
     name: '',
     tagline: '',
     city: 'Pune',
@@ -76,20 +82,22 @@ export default function OwnerDashboard({ openAuthModal, onExploreClick, onOpenFe
     };
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('homesetu_pgs_updated', handleStorageChange);
+    window.addEventListener('homesetu_bookings_updated', handleStorageChange);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('homesetu_pgs_updated', handleStorageChange);
+      window.removeEventListener('homesetu_bookings_updated', handleStorageChange);
     };
   }, [currentUser]);
 
   const loadData = async () => {
     if (!currentUser) return;
-    const reqs = await api.getOwnerBookings(currentUser.id);
+    const reqs = await api.getOwnerBookings(currentUser.id, currentUser.email);
     let myListings = [];
     try {
-      const res = await fetch(`/api/pgs/owner/${currentUser.id}`);
-      if (res.ok) {
+      const res = await safeApiFetch(`/api/pgs/owner/${currentUser.id}`, {}, 300);
+      if (res && res.ok) {
         myListings = await res.json();
       }
     } catch (e) {
@@ -97,7 +105,10 @@ export default function OwnerDashboard({ openAuthModal, onExploreClick, onOpenFe
     }
     if (myListings.length === 0) {
       const pgs = await api.getPgs();
-      myListings = pgs.filter(p => p.ownerId === currentUser.id || (p.ownerEmail && p.ownerEmail.toLowerCase() === currentUser.email?.toLowerCase()));
+      myListings = pgs.filter(p => 
+        String(p.ownerId) === String(currentUser.id) || 
+        (p.ownerEmail && currentUser.email && p.ownerEmail.toLowerCase() === currentUser.email.toLowerCase())
+      );
     }
     setRequests(reqs);
     setListings(myListings);
@@ -887,31 +898,147 @@ export default function OwnerDashboard({ openAuthModal, onExploreClick, onOpenFe
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-teal-300 font-semibold mb-1">City</label>
-                  <select
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full bg-[#082227] border border-teal-800 rounded-xl px-3 py-2 text-white"
-                  >
-                    <option value="Pune">Pune</option>
-                    <option value="Bengaluru">Bengaluru</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Kota">Kota</option>
-                  </select>
+              <div className="space-y-3 p-3.5 rounded-2xl bg-[#07242a] border border-teal-700/60">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase text-amber-400 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" /> Select State & Student Educational Hub (15 States x 15 Locations)
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-teal-800 text-teal-200 font-bold">
+                    All India Coverage
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-teal-300 font-semibold mb-1">Locality</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.locality}
-                    onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
-                    placeholder="e.g. Kothrud / Baner"
-                    className="w-full bg-[#082227] border border-teal-800 rounded-xl px-3 py-2 text-white"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-teal-300 font-semibold mb-1">
+                      1. State (15 Premier Student States)
+                    </label>
+                    <select
+                      value={selectedState}
+                      onChange={(e) => {
+                        const newState = e.target.value;
+                        setSelectedState(newState);
+                        const sData = getStateData(newState);
+                        const defaultLoc = sData.localities[0];
+                        setSelectedLocalityIndex(0);
+                        setIsCustomLocality(false);
+                        setFormData({
+                          ...formData,
+                          state: newState,
+                          city: sData.defaultCity,
+                          locality: defaultLoc ? defaultLoc.name : sData.defaultCity,
+                          nearbyColleges: defaultLoc ? defaultLoc.hub : '',
+                          monthlyRent: defaultLoc ? defaultLoc.avgRent : 7500,
+                          securityDeposit: defaultLoc ? defaultLoc.avgRent * 2 : 15000
+                        });
+                      }}
+                      className="w-full bg-[#082227] border border-teal-700 rounded-xl px-3 py-2 text-white font-semibold focus:border-amber-400"
+                    >
+                      {INDIAN_STATES_DATA.map(st => (
+                        <option key={st.id} value={st.state}>
+                          {st.state} ({st.localities.length} Famous Hubs)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-teal-300 font-semibold mb-1">
+                      2. Famous Locality / College Hub (15 Locations)
+                    </label>
+                    <select
+                      value={isCustomLocality ? 'custom' : selectedLocalityIndex}
+                      onChange={(e) => {
+                        if (e.target.value === 'custom') {
+                          setIsCustomLocality(true);
+                        } else {
+                          setIsCustomLocality(false);
+                          const idx = Number(e.target.value);
+                          setSelectedLocalityIndex(idx);
+                          const sData = getStateData(selectedState);
+                          const loc = sData.localities[idx];
+                          if (loc) {
+                            const cityName = loc.name.includes(',') ? loc.name.split(',')[1].trim() : sData.defaultCity;
+                            setFormData({
+                              ...formData,
+                              locality: loc.name,
+                              city: cityName,
+                              nearbyColleges: loc.hub,
+                              monthlyRent: loc.avgRent,
+                              securityDeposit: loc.avgRent * 2
+                            });
+                          }
+                        }
+                      }}
+                      className="w-full bg-[#082227] border border-teal-700 rounded-xl px-3 py-2 text-white font-semibold focus:border-amber-400"
+                    >
+                      {getStateData(selectedState).localities.map((loc, idx) => (
+                        <option key={idx} value={idx}>
+                          {idx + 1}. {loc.name} — ₹{loc.avgRent}/mo ({loc.hub})
+                        </option>
+                      ))}
+                      <option value="custom">✏️ Enter Custom / Other Locality...</option>
+                    </select>
+                  </div>
                 </div>
+
+                {isCustomLocality && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="block text-teal-300 font-semibold mb-1">Custom Locality Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.locality}
+                        onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
+                        placeholder="e.g. Near City College Gate"
+                        className="w-full bg-[#082227] border border-teal-700 rounded-xl px-3 py-2 text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-teal-300 font-semibold mb-1">City Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        placeholder="e.g. Pune"
+                        className="w-full bg-[#082227] border border-teal-700 rounded-xl px-3 py-2 text-white"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* AI State Benchmark Hint */}
+                {(() => {
+                  const sData = getStateData(selectedState);
+                  return (
+                    <div className="p-2.5 rounded-xl bg-[#092b33] border border-amber-500/30 text-[11px] text-teal-200 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>
+                          <strong>AI Market Intelligence for {selectedState}:</strong> Standard Double: <span className="text-amber-300 font-bold">{sData.rentRange.double}</span> • Single AC: <span className="text-emerald-300 font-bold">{sData.rentRange.singleAc}</span>
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const loc = sData.localities[selectedLocalityIndex] || sData.localities[0];
+                          if (loc) {
+                            setFormData(prev => ({
+                              ...prev,
+                              monthlyRent: loc.avgRent,
+                              securityDeposit: loc.avgRent * 2
+                            }));
+                          }
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold text-[10px] shrink-0"
+                      >
+                        ⚡ Apply ₹{getStateData(selectedState).localities[selectedLocalityIndex]?.avgRent || 7500} Rent
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div>

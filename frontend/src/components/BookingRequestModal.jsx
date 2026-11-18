@@ -3,7 +3,7 @@ import { X, Calendar, IndianRupee, Bed, Send, ShieldAlert, CheckCircle2, Buildin
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 
-export default function BookingRequestModal({ pg, rooms, onClose, onSuccess }) {
+export default function BookingRequestModal({ pg, rooms, onClose, onSuccess, openAuthModal }) {
   const { currentUser } = useAuth();
 
   const [roomType, setRoomType] = useState(rooms.length > 0 ? rooms[0].roomType : "Double Sharing");
@@ -37,6 +37,8 @@ export default function BookingRequestModal({ pg, rooms, onClose, onSuccess }) {
       pgCity: pg.city,
       pgLocality: pg.locality,
       ownerId: pg.ownerId,
+      ownerName: pg.ownerName || "PG Owner",
+      ownerEmail: pg.ownerEmail || "",
       roomType: roomType,
       monthlyRent: selectedRoom.pricePerMonth,
       moveInDate: moveInDate,
@@ -64,7 +66,7 @@ export default function BookingRequestModal({ pg, rooms, onClose, onSuccess }) {
             <h3 className="text-xl font-bold text-white mt-1">
               Booking Request
             </h3>
-            <p className="text-xs text-teal-300/80">{pg.name} • {pg.locality}, {pg.city}</p>
+            <p className="text-xs text-teal-300/80">{pg.name} • {pg.locality}, {pg.city} • <span className="text-amber-300 font-semibold">Host: {pg.ownerName || "PG Owner"}</span></p>
           </div>
           <button
             onClick={onClose}
@@ -87,6 +89,41 @@ export default function BookingRequestModal({ pg, rooms, onClose, onSuccess }) {
               Status: <strong>PENDING OWNER APPROVAL</strong>
               <br />
               Once approved, your unique <strong>Confirmation ID</strong> will be generated automatically.
+            </div>
+          </div>
+        ) : !currentUser ? (
+          <div className="p-8 text-center space-y-5">
+            <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-3xl mx-auto shadow-lg">
+              🎓
+            </div>
+            <div>
+              <h4 className="text-xl font-bold text-white">Student Account Required</h4>
+              <p className="text-xs text-amber-400 mt-1 uppercase font-bold tracking-wider">Sign In to Send Booking Request</p>
+            </div>
+            <p className="text-sm text-teal-200/80 max-w-sm mx-auto leading-relaxed">
+              To send a direct booking application to <strong>{pg.ownerName || "the PG Owner"}</strong> and receive your official Confirmation ID, please sign in or register as a student.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (openAuthModal) openAuthModal('login', 'STUDENT');
+                }}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-orange-500/20"
+              >
+                Sign In as Student
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (openAuthModal) openAuthModal('register', 'STUDENT');
+                }}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-teal-900/60 hover:bg-teal-800 text-teal-200 border border-teal-700/60 font-semibold text-xs transition-all"
+              >
+                Create Student Account
+              </button>
             </div>
           </div>
         ) : (

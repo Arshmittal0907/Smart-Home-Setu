@@ -1,3 +1,4 @@
+import { INDIAN_STATES_DATA, getStateData, getAllStates } from '../statesData';
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, Bot, Send, Search, Sliders, ArrowRight, 
@@ -58,70 +59,93 @@ export default function AiStudentAgent({
 
   // Quick Action Buttons
   const QUICK_ACTIONS = [
-    { label: `📍 PGs in Pune`, query: `give me pg in pune` },
-    { label: `📍 PGs in Ghaziabad`, query: `give me pg in ghaziabad` },
-    { label: `🎯 Near AKGEC`, query: `show verified pg near AKGEC campus` },
-    { label: `💰 Under ₹7,500`, query: `show affordable budget pg under 7500 with meals` },
-    { label: `🍲 Mess Menu`, query: `what is the weekly mess menu and food quality?` },
-    { label: `⚖️ Compare PGs`, query: `compare Sunrise PG and Green Nest PG` },
-    { label: `⏰ Gate Timing`, query: `gate closing time aur house rules kya hain?` },
-    { label: `🛡️ Deposit Refund`, query: `security deposit refund policy kya hai?` },
-    { label: `🚨 Report Issue`, query: `wifi issue hai complaint kaise karein?` }
+    { label: `📍 Pune & Mumbai`, query: `Maharashtra Pune mein PGs aur rent kaisa hai?` },
+    { label: `📍 Bengaluru & Manipal`, query: `Karnataka Bengaluru mein student PGs and food` },
+    { label: `📍 Delhi NCR Hubs`, query: `Delhi North and South Campus PGs and rent` },
+    { label: `📍 UP & Noida / Gzb`, query: `Uttar Pradesh Ghaziabad Noida student PGs` },
+    { label: `📍 Kota & Jaipur`, query: `Rajasthan Kota coaching student hostels and rent` },
+    { label: `📍 15 States Guide`, query: `HomeSetu par kaunse 15 states ke student hubs available hain?` },
+    { label: `🛡️ Girls PG Safety`, query: `Girls PG ke safety rules, biometric aur warden standards kya hain?` },
+    { label: `⚡ Boys PG Facilities`, query: `Boys PG mein high-speed wifi aur laundry facilities` },
+    { label: `🍲 Food & Mess Menu`, query: `Alag alag states mein mess food aur meal options kya hain?` },
+    { label: `💰 Rent by State`, query: `India ke top states mein average student PG rent kya hai?` }
   ];
 
   // Robust Search & Strict Filtering Engine
   function filterPgsIntelligently(rawQuery) {
     if (!allPgs || allPgs.length === 0) {
-      return { candidates: [], detectedCity: null, detectedGender: null, detectedCollege: null, maxBudget: null };
+      return { candidates: [], detectedState: null, detectedCity: null, detectedGender: null, detectedCollege: null, maxBudget: null };
     }
 
     const qLower = (rawQuery || '').toLowerCase();
 
-    // 1. Detect City
+    // 1. Detect State from 15 Indian States
+    let detectedStateObj = null;
+    for (const st of INDIAN_STATES_DATA) {
+      if (qLower.includes(st.state.toLowerCase()) || qLower.includes(st.id.toLowerCase())) {
+        detectedStateObj = st;
+        break;
+      }
+      if (st.cities.some(c => qLower.includes(c.toLowerCase()))) {
+        detectedStateObj = st;
+        break;
+      }
+    }
+
+    // 2. Detect City
     let detectedCity = null;
-    if (qLower.includes('pune')) detectedCity = 'Pune';
-    else if (qLower.includes('ghaziabad')) detectedCity = 'Ghaziabad';
-    else if (qLower.includes('noida') || qLower.includes('greater noida')) detectedCity = 'Noida';
-    else if (qLower.includes('delhi')) detectedCity = 'Delhi';
-    else if (qLower.includes('bengaluru') || qLower.includes('bangalore')) detectedCity = 'Bengaluru';
-    else if (qLower.includes('kota')) detectedCity = 'Kota';
+    if (detectedStateObj) {
+      const matchedCity = detectedStateObj.cities.find(c => qLower.includes(c.toLowerCase()));
+      detectedCity = matchedCity || detectedStateObj.defaultCity;
+    } else {
+      if (qLower.includes('pune')) detectedCity = 'Pune';
+      else if (qLower.includes('ghaziabad')) detectedCity = 'Ghaziabad';
+      else if (qLower.includes('noida') || qLower.includes('greater noida')) detectedCity = 'Noida';
+      else if (qLower.includes('delhi')) detectedCity = 'Delhi';
+      else if (qLower.includes('bengaluru') || qLower.includes('bangalore')) detectedCity = 'Bengaluru';
+      else if (qLower.includes('kota')) detectedCity = 'Kota';
+      else if (qLower.includes('mumbai')) detectedCity = 'Mumbai';
+      else if (qLower.includes('jaipur')) detectedCity = 'Jaipur';
+      else if (qLower.includes('chennai')) detectedCity = 'Chennai';
+      else if (qLower.includes('hyderabad')) detectedCity = 'Hyderabad';
+      else if (qLower.includes('ahmedabad')) detectedCity = 'Ahmedabad';
+      else if (qLower.includes('kolkata')) detectedCity = 'Kolkata';
+      else if (qLower.includes('indore')) detectedCity = 'Indore';
+      else if (qLower.includes('chandigarh')) detectedCity = 'Chandigarh';
+      else if (qLower.includes('kochi')) detectedCity = 'Kochi';
+      else if (qLower.includes('dehradun')) detectedCity = 'Dehradun';
+      else if (qLower.includes('bhubaneswar')) detectedCity = 'Bhubaneswar';
+    }
 
-    // 2. Detect Locality
+    // 3. Detect Locality
     let detectedLocality = null;
-    if (qLower.includes('kothrud')) { detectedLocality = 'Kothrud'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('baner')) { detectedLocality = 'Baner'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('viman nagar')) { detectedLocality = 'Viman Nagar'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('hinjewadi')) { detectedLocality = 'Hinjewadi'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('shivaji nagar') || qLower.includes('fc road')) { detectedLocality = 'Shivaji Nagar'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('crossings republik') || qLower.includes('crossings')) { detectedLocality = 'Crossings Republik'; detectedCity = detectedCity || 'Ghaziabad'; }
-    else if (qLower.includes('indirapuram')) { detectedLocality = 'Indirapuram'; detectedCity = detectedCity || 'Ghaziabad'; }
-    else if (qLower.includes('raj nagar')) { detectedLocality = 'Raj Nagar'; detectedCity = detectedCity || 'Ghaziabad'; }
-    else if (qLower.includes('koramangala')) { detectedLocality = 'Koramangala'; detectedCity = detectedCity || 'Bengaluru'; }
+    if (detectedStateObj) {
+      const locMatch = detectedStateObj.localities.find(l => {
+        const simpleName = l.name.toLowerCase().split(',')[0].trim();
+        return qLower.includes(simpleName);
+      });
+      if (locMatch) detectedLocality = locMatch.name;
+    }
 
-    // 3. Detect College
+    // 4. Detect College
     let detectedCollege = null;
-    if (qLower.includes('akgec') || qLower.includes('akg')) { detectedCollege = 'AKGEC'; detectedCity = detectedCity || 'Ghaziabad'; }
-    else if (qLower.includes('abes')) { detectedCollege = 'ABES'; detectedCity = detectedCity || 'Ghaziabad'; }
-    else if (qLower.includes('kiet')) { detectedCollege = 'KIET'; detectedCity = detectedCity || 'Ghaziabad'; }
-    else if (qLower.includes('galgotias')) { detectedCollege = 'Galgotias'; detectedCity = detectedCity || 'Noida'; }
-    else if (qLower.includes('ims')) { detectedCollege = 'IMS'; detectedCity = detectedCity || 'Ghaziabad'; }
-    else if (qLower.includes('coep')) { detectedCollege = 'COEP'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('mit')) { detectedCollege = 'MIT'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('cummins')) { detectedCollege = 'Cummins'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('symbiosis') || qLower.includes('scit')) { detectedCollege = 'Symbiosis'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('christ')) { detectedCollege = 'Christ'; detectedCity = detectedCity || 'Bengaluru'; }
-    else if (qLower.includes('nicmar')) { detectedCollege = 'NICMAR'; detectedCity = detectedCity || 'Pune'; }
-    else if (qLower.includes('fergusson') || qLower.includes('bmcc')) { detectedCollege = 'Fergusson'; detectedCity = detectedCity || 'Pune'; }
+    const collegeKeywords = ['akgec', 'abes', 'kiet', 'galgotias', 'ims', 'coep', 'mit', 'cummins', 'symbiosis', 'christ', 'nicmar', 'fergusson', 'iit', 'nit', 'allen', 'resonance', 'bhu', 'du', 'iim', 'sharda', 'amity'];
+    for (const ck of collegeKeywords) {
+      if (qLower.includes(ck)) {
+        detectedCollege = ck.toUpperCase();
+        break;
+      }
+    }
 
-    // 4. Detect Gender
+    // 5. Detect Gender
     let detectedGender = null;
-    if (qLower.includes('girl') || qLower.includes('female') || qLower.includes('women') || qLower.includes('ladki')) {
+    if (qLower.includes('girl') || qLower.includes('female') || qLower.includes('women') || qLower.includes('ladki') || qLower.includes('girls')) {
       detectedGender = 'GIRLS';
-    } else if (qLower.includes('boy') || qLower.includes('male') || qLower.includes('men') || qLower.includes('ladko') || qLower.includes('ladke')) {
+    } else if (qLower.includes('boy') || qLower.includes('male') || qLower.includes('men') || qLower.includes('ladko') || qLower.includes('ladke') || qLower.includes('boys')) {
       detectedGender = 'BOYS';
     }
 
-    // 5. Detect Budget
+    // 6. Detect Budget
     let maxBudget = null;
     const kBudget = qLower.match(/(\d+)\s*k\b/);
     if (kBudget) maxBudget = parseInt(kBudget[1], 10) * 1000;
@@ -130,31 +154,27 @@ export default function AiStudentAgent({
       if (numBudget) maxBudget = parseInt(numBudget[1], 10);
     }
 
-    // 6. Strict Filtering
+    // 7. Strict Filtering against loaded PGs
     let results = allPgs.filter(pg => {
-      // STRICT CITY MATCH
       if (detectedCity) {
         if (!pg.city || pg.city.toLowerCase() !== detectedCity.toLowerCase()) {
           return false;
         }
       }
 
-      // STRICT GENDER MATCH
       if (detectedGender === 'GIRLS') {
         if (pg.genderType === 'BOYS') return false;
       } else if (detectedGender === 'BOYS') {
         if (pg.genderType === 'GIRLS') return false;
       }
 
-      // Locality Match
       if (detectedLocality) {
         const fullAddr = `${pg.locality} ${pg.address} ${pg.name}`.toLowerCase();
-        if (!fullAddr.includes(detectedLocality.toLowerCase())) {
+        if (!fullAddr.includes(detectedLocality.toLowerCase().split(',')[0].trim())) {
           return false;
         }
       }
 
-      // College Match
       if (detectedCollege) {
         const colStr = `${pg.nearbyColleges} ${pg.address} ${pg.tagline}`.toLowerCase();
         if (!colStr.includes(detectedCollege.toLowerCase())) {
@@ -162,7 +182,6 @@ export default function AiStudentAgent({
         }
       }
 
-      // Budget Filter (with small grace buffer of ₹500)
       if (maxBudget && pg.monthlyRent > maxBudget + 500) {
         return false;
       }
@@ -170,34 +189,9 @@ export default function AiStudentAgent({
       return true;
     });
 
-    // If city was specified but locality/college had no exact match, fallback to all PGs in that city
-    if (results.length === 0 && detectedCity) {
-      results = allPgs.filter(pg => pg.city?.toLowerCase() === detectedCity.toLowerCase());
-    }
-
-    // Sort: if budget requested, lowest rent first; otherwise rating
-    if (qLower.includes('sasta') || qLower.includes('cheap') || qLower.includes('lowest') || qLower.includes('budget')) {
-      results.sort((a, b) => a.monthlyRent - b.monthlyRent);
-    } else {
-      results.sort((a, b) => (b.rating || 4.5) - (a.rating || 4.5));
-    }
-
-    // Add match badges
-    results = results.map((pg, idx) => ({
-      ...pg,
-      matchPercent: idx === 0 ? 98 : idx === 1 ? 95 : 92 - idx * 2,
-      matchHighlights: [
-        pg.city,
-        pg.locality,
-        `₹${pg.monthlyRent?.toLocaleString('en-IN')}/mo`,
-        pg.foodIncluded ? '3 Meals' : 'Kitchen Access',
-        pg.hasAc ? 'AC' : 'Cooler/Fan',
-        'KYC Verified'
-      ].filter(Boolean)
-    }));
-
     return {
       candidates: results,
+      detectedStateObj,
       detectedCity,
       detectedLocality,
       detectedCollege,
@@ -228,6 +222,61 @@ export default function AiStudentAgent({
     setTimeout(() => {
       let agentResponse = null;
 
+      // -------------------------------------------------------------
+      // 0. COMPREHENSIVE 15-STATE INTELLIGENCE HANDLER
+      // -------------------------------------------------------------
+      const stateMatch = INDIAN_STATES_DATA.find(st => 
+        qLower.includes(st.state.toLowerCase()) || 
+        qLower.includes(st.id.toLowerCase()) ||
+        st.cities.some(c => qLower.includes(c.toLowerCase()))
+      );
+
+      // Check if user specifically asks for all 15 states
+      if (qLower.includes('15 state') || qLower.includes('sabhi state') || qLower.includes('all state') || qLower.includes('states option') || qLower.includes('kaunse state')) {
+        agentResponse = {
+          id: 'agent-' + Date.now(),
+          sender: 'agent',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: `HomeSetu par India ke **15 Premier Student States** live hain, aur har state mein kam se kam **15 Famous Educational Locations (Total 225 Locations)** verified hain:\n\n` +
+            INDIAN_STATES_DATA.map((s, idx) => `${idx + 1}. **${s.state}**: ${s.localities.slice(0, 3).map(l => l.name).join(', ')}... (Rent: ${s.rentRange.double})`).join('\n') +
+            `\n\n💡 **Khas Suvidha**: Har state mein Girls PG Safety (Biometric, Warden), Boys PG High-Speed Wi-Fi & Power Backup, aur Regional Food Menu live hain. Aap kisi bhi specific state ka naam poochiye, main complete detail bataunga!`,
+          intent: 'STATES_LIST'
+        };
+      }
+      else if (stateMatch) {
+        const matchingPgs = allPgs.filter(p => 
+          p.city && (
+            p.city.toLowerCase() === stateMatch.defaultCity.toLowerCase() ||
+            stateMatch.cities.some(c => c.toLowerCase() === p.city.toLowerCase())
+          )
+        );
+
+        agentResponse = {
+          id: 'agent-' + Date.now(),
+          sender: 'agent',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: `Zaroor! Ye rahi **${stateMatch.state}** ke student accommodations ki complete verified report:\n\n` +
+            `💰 **Rent & Pricing in ${stateMatch.state}**:\n` +
+            `• **Triple Sharing**: ${stateMatch.rentRange.triple}/month (Budget Option)\n` +
+            `• **Double Sharing**: ${stateMatch.rentRange.double}/month (Most Popular)\n` +
+            `• **Single Private AC Room**: ${stateMatch.rentRange.singleAc}/month (Premium Living)\n` +
+            `• **Security Deposit**: ${stateMatch.rentRange.depositMonths || '1–2 months'} rent\n\n` +
+            `🍲 **Food & Mess Quality**:\n` +
+            `• ${stateMatch.foodOptions}\n\n` +
+            `🛡️ **Girls PG Safety Standards**:\n` +
+            `• ${stateMatch.girlsSafety}\n\n` +
+            `⚡ **Boys PG Facilities**:\n` +
+            `• ${stateMatch.boysFacilities}\n\n` +
+            `📍 **Top Famous Student Hubs in ${stateMatch.state}**:\n` +
+            stateMatch.localities.slice(0, 7).map((l, i) => `• **${l.name}** (${l.hub}) — Avg: ₹${l.avgRent}/mo`).join('\n') +
+            (matchingPgs.length > 0 ? `\n\nNeeche ${stateMatch.state} ke verified PGs diye gaye hain jinhe aap direct book kar sakte hain:` : `\n\nNaye owners ${stateMatch.state} ke 15 educational hubs mein apni properties register kar rahe hain!`),
+          intent: 'STATE_INTEL',
+          data: {
+            pgs: matchingPgs.length > 0 ? matchingPgs.slice(0, 4) : allPgs.slice(0, 2),
+            note: `Showing verified accommodations in ${stateMatch.state}:`
+          }
+        };
+      }
       // -------------------------------------------------------------
       // 1. COMPARISON INTENT ("compare", "vs", "which is better")
       // -------------------------------------------------------------

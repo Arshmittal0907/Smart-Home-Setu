@@ -344,6 +344,7 @@ export default function App() {
           <PgDetailsModal
             pg={selectedPg}
             onClose={() => setSelectedPg(null)}
+            openAuthModal={openAuthModal}
           />
         )}
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  UserCheck,
   Star, ShieldCheck, MapPin, IndianRupee, Users, Wifi,
   Wind, Utensils, Bed, GitCompare, Eye, Check, Clock,
   Navigation, Bike, Shield
@@ -91,6 +92,22 @@ export default function PgCard({ pg, onSelect, isCompared, toggleCompare, select
           <div className="flex items-center gap-1.5 text-xs text-teal-300/80 mt-1">
             <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span className="font-semibold text-teal-200">{pg.locality}, {pg.city}</span>
+          </div>
+
+          {/* Owner / Host Name Strip */}
+          <div className="mt-2.5 flex items-center justify-between text-xs bg-[#082228] border border-teal-800/80 px-2.5 py-1.5 rounded-xl shadow-xs">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <div className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold flex items-center justify-center text-[10px] shrink-0">
+                {pg.ownerName ? pg.ownerName.charAt(0).toUpperCase() : 'H'}
+              </div>
+              <span className="text-[11px] text-teal-300/80 shrink-0">Host:</span>
+              <span className="font-bold text-white text-xs truncate">
+                {pg.ownerName || "Verified Host"}
+              </span>
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30 shrink-0 ml-1">
+              Direct Owner
+            </span>
           </div>
 
           {/* Dynamic College Commute Strip if selected, else nearby colleges */}

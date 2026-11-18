@@ -61,7 +61,7 @@ export const DEMO_USERS = {
       city: "Ghaziabad"
     }
   ],
-  owners: [
+    owners: [
     {
       id: 11,
       fullName: "Vikram Chauhan",
@@ -69,8 +69,8 @@ export const DEMO_USERS = {
       password: "Owner@123",
       role: "OWNER",
       phone: "+91 98222 30001",
-      propertyName: "Chauhan Residency (5 PGs)",
-      city: "Crossings Republik, Ghaziabad"
+      propertyName: "Green Nest PG — Baner",
+      city: "Baner, Pune"
     },
     {
       id: 12,
@@ -79,8 +79,8 @@ export const DEMO_USERS = {
       password: "Owner@123",
       role: "OWNER",
       phone: "+91 98222 30002",
-      propertyName: "Aggarwal PG Homes (5 PGs)",
-      city: "Indirapuram, Ghaziabad"
+      propertyName: "Scholar Haven — Hinjewadi",
+      city: "Hinjewadi, Pune"
     },
     {
       id: 13,
@@ -89,8 +89,8 @@ export const DEMO_USERS = {
       password: "Owner@123",
       role: "OWNER",
       phone: "+91 98222 30003",
-      propertyName: "Tyagi Student Stays (5 PGs)",
-      city: "Opp. ABES Gate, Ghaziabad"
+      propertyName: "Harmony Living — Shivaji Nagar",
+      city: "Shivaji Nagar, Pune"
     },
     {
       id: 14,
@@ -99,8 +99,8 @@ export const DEMO_USERS = {
       password: "Owner@123",
       role: "OWNER",
       phone: "+91 98222 30004",
-      propertyName: "Singhal Comfort Living (5 PGs)",
-      city: "Raj Nagar Ext & KIET"
+      propertyName: "Royal Comfort PG — Koramangala",
+      city: "Koramangala, Bengaluru"
     },
     {
       id: 15,
@@ -109,8 +109,38 @@ export const DEMO_USERS = {
       password: "Owner@123",
       role: "OWNER",
       phone: "+91 98222 30005",
-      propertyName: "Sharma Executive Living (5 PGs)",
-      city: "Noida Sector 62 & Gr. Noida"
+      propertyName: "Silicon Comfort PG — Electronic City",
+      city: "Electronic City, Bengaluru"
+    },
+    {
+      id: 10,
+      fullName: "Ramesh Sharma",
+      email: "owner@homesetu.com",
+      password: "Owner@123",
+      role: "OWNER",
+      phone: "+91 91234 56789",
+      propertyName: "Sunrise PG — Kothrud",
+      city: "Kothrud, Pune"
+    },
+    {
+      id: 16,
+      fullName: "Sunita Patil",
+      email: "sunita@homesetu.com",
+      password: "Owner@123",
+      role: "OWNER",
+      phone: "+91 98222 40001",
+      propertyName: "Urban Stay Girls PG — Viman Nagar",
+      city: "Viman Nagar, Pune"
+    },
+    {
+      id: 991,
+      fullName: "Arushi Sharma",
+      email: "arushi.pg@homesetu.demo",
+      password: "Owner@123",
+      role: "OWNER",
+      phone: "+91 98111 88772",
+      propertyName: "Arushi PG — Crossings Republik",
+      city: "Crossings Republik, Ghaziabad"
     }
   ],
   admin: {

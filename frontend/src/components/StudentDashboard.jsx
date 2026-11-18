@@ -20,12 +20,23 @@ export default function StudentDashboard({ onExploreClick, openAuthModal, onOpen
 
   useEffect(() => {
     loadData();
+
+    const handleStorageChange = () => {
+      loadData();
+    };
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('homesetu_bookings_updated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('homesetu_bookings_updated', handleStorageChange);
+    };
   }, [currentUser]);
 
   const loadData = async () => {
     if (!currentUser) return;
     setLoading(false);
-    const data = await api.getStudentBookings(currentUser.id);
+    const data = await api.getStudentBookings(currentUser.id, currentUser.email);
     const visitList = await api.getVisits();
     const pgsList = await api.getPgs({});
     setBookings(data);
@@ -234,6 +245,11 @@ export default function StudentDashboard({ onExploreClick, openAuthModal, onOpen
                           <MapPin className="w-3.5 h-3.5 text-amber-400" />
                           {booking.pgLocality}, {booking.pgCity}
                         </span>
+                        {booking.ownerName && (
+                          <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#082228] text-amber-300 border border-teal-700/80 font-semibold flex items-center gap-1">
+                            👤 Host: <strong className="text-white">{booking.ownerName}</strong>
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-4 text-xs text-teal-200/90">

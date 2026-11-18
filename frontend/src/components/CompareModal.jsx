@@ -105,6 +105,7 @@ export default function CompareModal({ compareList, removeFromCompare, onSelectP
       }
     },
     { label: "Security Deposit", render: (pg) => <span>₹{pg.securityDeposit?.toLocaleString('en-IN') || "15,000"}</span> },
+    { label: "Host / Owner", render: (pg) => <span className="font-semibold text-amber-300">{pg.ownerName || "Verified Host"}</span> },
     { label: "Location", render: (pg) => <span>{pg.locality}, {pg.city}</span> },
     { label: "PG Type", render: (pg) => <span className="font-semibold">{pg.genderType}</span> },
     { label: "Verified Status", render: (pg) => pg.isVerified ? <span className="text-teal-400 font-bold flex items-center justify-center gap-1"><ShieldCheck className="w-4 h-4" /> Verified</span> : <span className="text-slate-400">Standard</span> },

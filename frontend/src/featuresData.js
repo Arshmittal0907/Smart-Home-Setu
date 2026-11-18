@@ -560,3 +560,5 @@ export const INITIAL_ROOMMATE_WANTED = [
   }
 ];
 
+
+export * from './statesData';

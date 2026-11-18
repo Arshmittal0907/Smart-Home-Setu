@@ -370,7 +370,7 @@ export default function AuthModal({ initialMode = 'login', initialRole = null, o
                   <p className="text-[11px] text-amber-950/80">
                     Click any student below to immediately log in and explore student dashboard & campus PGs:
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
                     {DEMO_USERS.students.map((st, idx) => (
                       <button
                         key={st.email}
@@ -411,7 +411,7 @@ export default function AuthModal({ initialMode = 'login', initialRole = null, o
                       </span>
                     </div>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-200 text-orange-900 font-bold">
-                      5 Owners (25 PGs)
+                      {DEMO_USERS.owners.length} Dedicated Owners
                     </span>
                   </div>
                   <p className="text-[11px] text-orange-950/80">
@@ -436,7 +436,7 @@ export default function AuthModal({ initialMode = 'login', initialRole = null, o
                             </span>
                           </div>
                           <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                            {ow.propertyName.replace(/\(.*?\)/g, '').trim()}
+                            {ow.propertyName}
                           </p>
                         </div>
                         <span className="text-[10px] font-bold text-orange-700 bg-orange-50 group-hover:bg-orange-500 group-hover:text-white px-2 py-1 rounded-lg transition-colors shrink-0">

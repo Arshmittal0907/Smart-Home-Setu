@@ -3,7 +3,7 @@ import { Filter, RotateCcw, ShieldCheck, IndianRupee, MapPin, GraduationCap, Awa
 import { MASTER_COLLEGES } from '../featuresData';
 
 export default function PgFilterSidebar({ filters, setFilters, onReset, selectedCollege, onSelectCollege }) {
-  const cities = ["All", "Pune", "Bengaluru", "Delhi", "Kota", "Mumbai"];
+  const cities = ["All", "Pune", "Bengaluru", "Delhi", "Ghaziabad", "Noida", "Kota", "Jaipur", "Mumbai", "Chennai", "Hyderabad", "Ahmedabad", "Kolkata", "Indore", "Chandigarh", "Kochi", "Dehradun", "Bhubaneswar"];
 
   const handleCheckboxChange = (field) => {
     setFilters(prev => ({ ...prev, [field]: !prev[field] }));

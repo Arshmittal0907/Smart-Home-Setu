@@ -10,8 +10,8 @@ export default function Navbar({ activeTab, setActiveTab, compareList, openCompa
     <header className="sticky top-0 z-40 bg-[#092227]/95 backdrop-blur-md border-b border-[#144852] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         {/* Brand Logo */}
-        <div 
-          onClick={() => setActiveTab('explore')} 
+        <div
+          onClick={() => setActiveTab('explore')}
           className="flex items-center gap-3 cursor-pointer group"
         >
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
@@ -36,11 +36,10 @@ export default function Navbar({ activeTab, setActiveTab, compareList, openCompa
         <nav className="hidden md:flex items-center gap-1 bg-[#0d343c]/80 p-1.5 rounded-full border border-[#17525e]">
           <button
             onClick={() => setActiveTab('explore')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${
-              activeTab === 'explore'
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${activeTab === 'explore'
                 ? 'bg-amber-500 text-white shadow-md'
                 : 'text-slate-300 hover:text-white hover:bg-[#144852]'
-            }`}
+              }`}
           >
             <Compass className="w-4 h-4" />
             Discover PGs
@@ -50,11 +49,10 @@ export default function Navbar({ activeTab, setActiveTab, compareList, openCompa
           {activeTab !== 'owner-dashboard' && activeTab !== 'admin' && currentUser?.role !== 'OWNER' && currentUser?.role !== 'ADMIN' && (
             <button
               onClick={() => setActiveTab('roommates')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                activeTab === 'roommates'
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${activeTab === 'roommates'
                   ? 'bg-amber-500 text-white shadow-md'
                   : 'text-slate-300 hover:text-white hover:bg-[#144852]'
-              }`}
+                }`}
             >
               <Users className="w-4 h-4" />
               Roommates
@@ -63,11 +61,10 @@ export default function Navbar({ activeTab, setActiveTab, compareList, openCompa
 
           <button
             onClick={() => setActiveTab('how-it-works')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${
-              activeTab === 'how-it-works'
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${activeTab === 'how-it-works'
                 ? 'bg-amber-500 text-white shadow-md'
                 : 'text-slate-300 hover:text-white hover:bg-[#144852]'
-            }`}
+              }`}
           >
             <HelpCircle className="w-4 h-4" />
             How It Works
@@ -86,11 +83,10 @@ export default function Navbar({ activeTab, setActiveTab, compareList, openCompa
                 if (onOpenFeedback) onOpenFeedback('COMPLAINT');
               }
             }}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${
-              currentUser?.role === 'ADMIN' && activeTab === 'admin'
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${currentUser?.role === 'ADMIN' && activeTab === 'admin'
                 ? 'bg-purple-900/70 text-purple-200 border border-purple-500/60 shadow-md font-bold'
                 : 'text-slate-300 hover:text-white hover:bg-[#144852]'
-            }`}
+              }`}
             title={currentUser?.role === 'ADMIN' ? "Monitor & Respond to Student & PG Owner Grievances" : "Submit Feedback or Report a Grievance"}
           >
             <MessageSquare className="w-4 h-4 text-amber-400" />
@@ -144,11 +140,10 @@ export default function Navbar({ activeTab, setActiveTab, compareList, openCompa
                 <div className="text-left hidden lg:block">
                   <div className="text-xs font-semibold text-white leading-tight flex items-center gap-1.5">
                     {currentUser.fullName}
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-normal uppercase ${
-                      currentUser.role === 'OWNER' ? 'bg-orange-900/60 text-orange-300 border border-orange-700/40' :
-                      currentUser.role === 'ADMIN' ? 'bg-purple-900/60 text-purple-300 border border-purple-700/40' :
-                      'bg-teal-900/60 text-teal-300 border border-teal-700/40'
-                    }`}>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-normal uppercase ${currentUser.role === 'OWNER' ? 'bg-orange-900/60 text-orange-300 border border-orange-700/40' :
+                        currentUser.role === 'ADMIN' ? 'bg-purple-900/60 text-purple-300 border border-purple-700/40' :
+                          'bg-teal-900/60 text-teal-300 border border-teal-700/40'
+                      }`}>
                       {currentUser.role}
                     </span>
                   </div>
